@@ -1,0 +1,3 @@
+include ':ELogger'
+include ':app'
+rootProject.name = "phoenix-logger"
