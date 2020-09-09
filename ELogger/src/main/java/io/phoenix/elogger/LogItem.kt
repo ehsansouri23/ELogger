@@ -4,14 +4,13 @@ import java.util.*
 
 abstract class LogItem(
     val logMessage: String,
-    val logLevel: LogLevel
 ) {
 
     abstract val fileName: String
 
     abstract val tag: String
 
-    override fun toString(): String =
+    fun toLogString(logLevel: LogLevel): String =
         logLevel.let { "${dateFormatter.format(Date())}/ $it/$tag: $logMessage\n" }
 
 }

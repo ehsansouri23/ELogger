@@ -17,7 +17,7 @@ import java.util.*
 object ELogger {
     private lateinit var context: Context
     private var started = false
-    private val logChannel = Channel<LogItem>()
+    private val logChannel = Channel<Pair<LogItem, LogLevel>>()
 
     private val dayFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
 
@@ -27,17 +27,21 @@ object ELogger {
         started = true
 
         GlobalScope.launch(Dispatchers.IO) {
-            logChannel.consumeEach { log ->
+            logChannel.consumeEach {
                 getFile(
                     context,
-                    "${log.fileName}-${dayFormatter.format(Date())}.txt"
-                ).appendText(log.toString())
+                    "${it.first.fileName}-${dayFormatter.format(Date())}.txt"
+                ).appendText(
+                    it.first.toLogString(
+                        it.second
+                    )
+                )
             }
         }
     }
 
-    suspend fun log(logItem: LogItem) {
-        when (logItem.logLevel) {
+    suspend fun log(logItem: LogItem, logLevel: LogLevel) {
+        when (logLevel) {
             LogLevel.VERBOSE -> Log.v(logItem.tag, logItem.logMessage)
             LogLevel.ERROR -> Log.e(logItem.tag, logItem.logMessage)
             LogLevel.DEBUG -> Log.d(logItem.tag, logItem.logMessage)
@@ -45,10 +49,25 @@ object ELogger {
             LogLevel.INFO -> Log.i(logItem.tag, logItem.logMessage)
         }
         if (started)
-            logChannel.send(logItem)
+            logChannel.send(logItem to logLevel)
     }
 
-    fun share() {
+    suspend fun v(logItem: LogItem) =
+        log(logItem, LogLevel.VERBOSE)
+
+    suspend fun d(logItem: LogItem) =
+        log(logItem, LogLevel.DEBUG)
+
+    suspend fun i(logItem: LogItem) =
+        log(logItem, LogLevel.INFO)
+
+    suspend fun w(logItem: LogItem) =
+        log(logItem, LogLevel.WARN)
+
+    suspend fun e(logItem: LogItem) =
+        log(logItem, LogLevel.ERROR)
+
+    fun deleteOldLogFiles() {
 
     }
 }
