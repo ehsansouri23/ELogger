@@ -30,14 +30,18 @@ object ELogger {
 
         GlobalScope.launch(Dispatchers.IO) {
             logChannel.consumeEach {
-                getFile(
-                    context,
-                    "${it.first.fileName}-${dayFormatter.format(Date())}.txt"
-                ).appendText(
-                    it.first.toLogString(
-                        it.second
+                try {
+                    getFile(
+                        context,
+                        "${it.first.fileName}-${dayFormatter.format(Date())}.txt"
+                    ).appendText(
+                        it.first.toLogString(
+                            it.second
+                        )
                     )
-                )
+                } catch (ignored: Exception) {
+
+                }
             }
         }
     }
