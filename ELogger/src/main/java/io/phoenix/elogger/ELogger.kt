@@ -1,6 +1,7 @@
 package io.phoenix.elogger
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -23,8 +24,9 @@ object ELogger {
 
 
     fun start(context: Context) {
-        this@ELogger.context = context
+        this@ELogger.context = context.applicationContext
         started = true
+        fireDeleteOldFilesWork(context)
 
         GlobalScope.launch(Dispatchers.IO) {
             logChannel.consumeEach {
@@ -67,7 +69,6 @@ object ELogger {
     suspend fun e(logItem: LogItem) =
         log(logItem, LogLevel.ERROR)
 
-    fun deleteOldLogFiles() {
-
-    }
+    fun getLogFile(fileName: String): Uri? =
+        getNewestFile(context, fileName)
 }
