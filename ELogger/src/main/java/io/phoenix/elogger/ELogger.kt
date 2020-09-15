@@ -30,7 +30,7 @@ object ELogger {
 
         GlobalScope.launch(Dispatchers.IO) {
             logChannel.consumeEach {
-                try {
+                runCatching {
                     getFile(
                         context,
                         "${it.first.fileName}-${dayFormatter.format(Date())}.txt"
@@ -39,8 +39,8 @@ object ELogger {
                             it.second
                         )
                     )
-                } catch (ignored: Exception) {
-
+                }.onFailure {
+                    it.printStackTrace()
                 }
             }
         }
