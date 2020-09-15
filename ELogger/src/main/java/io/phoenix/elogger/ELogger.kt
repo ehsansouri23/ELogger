@@ -46,7 +46,7 @@ object ELogger {
         }
     }
 
-    suspend fun log(logItem: LogItem, logLevel: LogLevel) {
+    private suspend fun log(logItem: LogItem, logLevel: LogLevel, logToFile: Boolean = true) {
         when (logLevel) {
             LogLevel.VERBOSE -> Log.v(logItem.tag, logItem.logMessage)
             LogLevel.ERROR -> Log.e(logItem.tag, logItem.logMessage)
@@ -54,24 +54,24 @@ object ELogger {
             LogLevel.WARN -> Log.w(logItem.tag, logItem.logMessage)
             LogLevel.INFO -> Log.i(logItem.tag, logItem.logMessage)
         }
-        if (started)
+        if (started && logToFile)
             logChannel.send(logItem to logLevel)
     }
 
-    suspend fun v(logItem: LogItem) =
-        log(logItem, LogLevel.VERBOSE)
+    suspend fun v(logItem: LogItem, logToFile: Boolean = true) =
+        log(logItem, LogLevel.VERBOSE, logToFile)
 
-    suspend fun d(logItem: LogItem) =
-        log(logItem, LogLevel.DEBUG)
+    suspend fun d(logItem: LogItem, logToFile: Boolean = true) =
+        log(logItem, LogLevel.DEBUG, logToFile)
 
-    suspend fun i(logItem: LogItem) =
-        log(logItem, LogLevel.INFO)
+    suspend fun i(logItem: LogItem, logToFile: Boolean = true) =
+        log(logItem, LogLevel.INFO, logToFile)
 
-    suspend fun w(logItem: LogItem) =
-        log(logItem, LogLevel.WARN)
+    suspend fun w(logItem: LogItem, logToFile: Boolean = true) =
+        log(logItem, LogLevel.WARN, logToFile)
 
-    suspend fun e(logItem: LogItem) =
-        log(logItem, LogLevel.ERROR)
+    suspend fun e(logItem: LogItem, logToFile: Boolean = true) =
+        log(logItem, LogLevel.ERROR, logToFile)
 
     fun getLogFile(fileName: String): Uri? =
         getNewestFile(context, fileName)
